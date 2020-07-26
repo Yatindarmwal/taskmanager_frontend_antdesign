@@ -28,14 +28,6 @@ const columns = [
   },
 ];
 
-const getRandomuserParams = params => {
-  return {
-    results: params.pagination.pageSize,
-    page: params.pagination.current,
-    ...params,
-  };
-};
-
 class App extends React.Component {
   state = {
     data: [],
@@ -52,11 +44,11 @@ class App extends React.Component {
   }
 
   handleTableChange = (pagination, filters, sorter) => {
-    console.log(sorter);
+    console.log(pagination);
     this.fetch({
       sortField: sorter.field,
       sortOrder: sorter.order,
-      pagination,
+      ...pagination,
       ...filters,
     });
   };
@@ -67,21 +59,21 @@ class App extends React.Component {
       url: '/task',
       method: 'get',
       type: 'json',
-      // data: getRandomuserParams(params),
       data: {
         user_id: '5f1d0e62f9d77c2f21d22e45',
         filter: JSON.stringify(params.status),
         sort_by: params.sortField,
-        sort_order: params.sortOrder
+        sort_order: params.sortOrder,
+        offset: ((params.current - 1) * params.pageSize),
+        limit: params.pageSize
       }
     }).then(data => {
-      console.log(data);
       this.setState({
         loading: false,
-        data: data,
+        data: data.task_list,
         pagination: {
           ...params.pagination,
-          total: 20,
+          total: data.count,
           // 200 is mock data, you should read it from server
           // total: data.totalCount,
         },
@@ -94,7 +86,7 @@ class App extends React.Component {
     return (
       <Table
         columns={columns}
-        rowKey={record => data._id}
+        rowKey={record => data.id}
         dataSource={data}
         pagination={pagination}
         loading={loading}
