@@ -18,6 +18,14 @@ const columns = [
       { text: 'Pending', value: 'Pending' },
       { text: 'Complete', value: 'Complete' },
     ],
+    render: status => {
+      let color = status == 'Pending' ? '#FFA500' : 'green';
+      return (
+        <font color={color} key={status}>
+          {status.toUpperCase()}
+        </font>
+      );
+    },
     width: '20%'
   },
   {
